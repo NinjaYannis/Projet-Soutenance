@@ -1,0 +1,21 @@
+# Python
+*.pyc
+__pycache__/
+venv/
+.env
+.pytest_cache/
+
+# Django
+db.sqlite3
+/media
+/static
+*.log
+secret_key.py # Si vous externalisez la clé secrète
+
+# IDEs
+.idea/
+.vscode/
+
+# Operating System
+.DS_Store
+Thumbs.db
