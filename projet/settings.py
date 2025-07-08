@@ -91,12 +91,12 @@ WSGI_APPLICATION = 'projet.wsgi.application'
 
 DATABASES = {
     'default': {
-        [cite_start]'ENGINE': 'django.db.backends.postgresql_psycopg2', # Changé pour PostgreSQL [cite: 1]
-        [cite_start]'NAME': os.environ.get('DB_NAME'), # Nom de votre base de données sur Supabase [cite: 1]
-        [cite_start]'USER': os.environ.get('DB_USER'), # Utilisateur de la base de données [cite: 1]
-        [cite_start]'PASSWORD': os.environ.get('DB_PASSWORD'), # Mot de passe de la base de données [cite: 1]
-        [cite_start]'HOST': os.environ.get('DB_HOST'), # Hôte de la base de données Supabase [cite: 1]
-        [cite_start]'PORT': os.environ.get('DB_PORT'), # Port de la base de données (généralement 5432) [cite: 1]
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Changé pour PostgreSQL 
+        'NAME': os.environ.get('DB_NAME'), # Nom de votre base de données sur Supabase 
+        'USER': os.environ.get('DB_USER'), # Utilisateur de la base de données 
+        'PASSWORD': os.environ.get('DB_PASSWORD'), # Mot de passe de la base de données 
+        'HOST': os.environ.get('DB_HOST'), # Hôte de la base de données Supabase 
+        'PORT': os.environ.get('DB_PORT'), # Port de la base de données (généralement 5432) 
     }
 }
 
@@ -123,9 +123,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-[cite_start]LANGUAGE_CODE = 'fr-fr' # Changé en français [cite: 1]
+LANGUAGE_CODE = 'fr-fr' # Changé en français [cite: 1]
 
-[cite_start]TIME_ZONE = 'Africa/Porto-Novo' # Changé pour Cotonou, Bénin [cite: 1]
+TIME_ZONE = 'Africa/Porto-Novo' # Changé pour Cotonou, Bénin [cite: 1]
 
 USE_I18N = True
 
