@@ -11,6 +11,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os # Importez le module os pour accéder aux variables d'environnement
+
+# Importez dotenv et chargez les variables d'environnement AU DÉBUT de settings.py
+# Assurez-vous d'avoir installé python-dotenv (pip install python-dotenv)
+from dotenv import load_dotenv
+load_dotenv() # Charge les variables du fichier .env
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +27,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-jm2_v%462j$hy2ap$ajmy@yhx^qee-yqz2wn30$gry%%7d@%1('
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-votre_cle_secrete')
+# Il est recommandé de ne pas stocker la clé secrète en clair ici.
+# Elle devrait être une variable d'environnement ou chargée depuis un fichier séparé.
+# Pour le développement, l'exemple ci-dessus est suffisant.
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+# Récupère DEBUG depuis une variable d'environnement, par défaut à True.
 
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+# Récupère les hôtes autorisés depuis une variable d'environnement.
+# En développement, peut être vide ou 'localhost', '127.0.0.1'.
 
 
 # Application definition
@@ -37,6 +52,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'tickets', # Votre application pour les tickets [cite: 1]
+    'rest_framework', # Pour Django REST Framework [cite: 1]
 ]
 
 MIDDLEWARE = [
@@ -74,8 +91,12 @@ WSGI_APPLICATION = 'projet.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        [cite_start]'ENGINE': 'django.db.backends.postgresql_psycopg2', # Changé pour PostgreSQL [cite: 1]
+        [cite_start]'NAME': os.environ.get('DB_NAME'), # Nom de votre base de données sur Supabase [cite: 1]
+        [cite_start]'USER': os.environ.get('DB_USER'), # Utilisateur de la base de données [cite: 1]
+        [cite_start]'PASSWORD': os.environ.get('DB_PASSWORD'), # Mot de passe de la base de données [cite: 1]
+        [cite_start]'HOST': os.environ.get('DB_HOST'), # Hôte de la base de données Supabase [cite: 1]
+        [cite_start]'PORT': os.environ.get('DB_PORT'), # Port de la base de données (généralement 5432) [cite: 1]
     }
 }
 
@@ -102,9 +123,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+[cite_start]LANGUAGE_CODE = 'fr-fr' # Changé en français [cite: 1]
 
-TIME_ZONE = 'UTC'
+[cite_start]TIME_ZONE = 'Africa/Porto-Novo' # Changé pour Cotonou, Bénin [cite: 1]
 
 USE_I18N = True
 
