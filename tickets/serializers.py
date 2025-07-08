@@ -8,7 +8,7 @@ class TicketSerializer(serializers.ModelSerializer):
         # L'ID, la date de soumission, le statut et la priorité par défaut sont gérés par le modèle.
         # L'agent n'est pas assigné à ce stade.
         model = Ticket
-        fields = ['first_name', 'last_name', 'email', 'subject', 'message']
+        fields = ['first_name', 'last_name', 'email', 'subject', 'message','platform_name']
 
     def create(self, validated_data):
         subject = validated_data.get('subject', '').lower()
