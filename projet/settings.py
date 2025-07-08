@@ -18,6 +18,9 @@ import os # Importez le module os pour accéder aux variables d'environnement
 from dotenv import load_dotenv
 load_dotenv() # Charge les variables du fichier .env
 
+from rest_framework.authentication import BaseAuthentication
+from rest_framework.exceptions import AuthenticationFailed
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -122,6 +125,29 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
+
+
+
+# Configuration pour les API Keys des plateformes d'origine
+# Ces clés sont chargées depuis le fichier .env
+API_KEYS = {
+    # Clé API : Nom de la plateforme associée
+    os.environ.get("API_KEY_SITE1"): "Site Web Principal Esseyi",
+    os.environ.get("API_KEY_SITE2"): "Africa Certif",
+    os.environ.get("API_KEY_SITE3"): "CV Studioo",
+}
+
+
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+         'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ]
+}
+
 
 LANGUAGE_CODE = 'fr-fr' # Changé en français [cite: 1]
 
