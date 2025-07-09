@@ -11,10 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import os # Importez le module os pour accéder aux variables d'environnement
-
-# Importez dotenv et chargez les variables d'environnement AU DÉBUT de settings.py
-# Assurez-vous d'avoir installé python-dotenv (pip install python-dotenv)
+import os 
 from dotenv import load_dotenv
 load_dotenv() # Charge les variables du fichier .env
 
@@ -31,22 +28,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-votre_cle_secrete')
-# Il est recommandé de ne pas stocker la clé secrète en clair ici.
-# Elle devrait être une variable d'environnement ou chargée depuis un fichier séparé.
-# Pour le développement, l'exemple ci-dessus est suffisant.
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
-# Récupère DEBUG depuis une variable d'environnement, par défaut à True.
+.
 
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
-# Récupère les hôtes autorisés depuis une variable d'environnement.
-# En développement, peut être vide ou 'localhost', '127.0.0.1'.
-
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -55,9 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tickets', # Votre application pour les tickets [cite: 1]
-    'rest_framework', # Pour Django REST Framework [cite: 1]
-]
+    'tickets', # Votre application pour les tickets 
+    'rest_framework', # Pour Django REST Framework 
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -129,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Configuration pour les API Keys des plateformes d'origine
-# Ces clés sont chargées depuis le fichier .env
+
 API_KEYS = {
     # Clé API : Nom de la plateforme associée
     os.environ.get("API_KEY_SITE1"): "Site Web Principal Esseyi",
@@ -149,9 +138,9 @@ REST_FRAMEWORK = {
 }
 
 
-LANGUAGE_CODE = 'fr-fr' # Changé en français [cite: 1]
+LANGUAGE_CODE = 'fr-fr' 
 
-TIME_ZONE = 'Africa/Porto-Novo' # Changé pour Cotonou, Bénin [cite: 1]
+TIME_ZONE = 'Africa/Porto-Novo'
 
 USE_I18N = True
 
