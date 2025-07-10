@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'tickets', # Votre application pour les tickets [cite: 1]
     'rest_framework', # Pour Django REST Framework [cite: 1]
     'rest_framework_simplejwt',
+     'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
