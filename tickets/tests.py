@@ -252,9 +252,6 @@ class TicketAPITest(APITestCase):
 
 
     def test_other_agent_cannot_update_ticket(self):
-        """
-        Vérifie qu'un agent non assigné ne peut pas modifier le ticket d'un autre agent.
-        """
         headers = self.get_auth_headers(self.agent2_access_token)
         url = reverse('ticket-update', args=[self.ticket_assigned_to_agent1.id])
         data = {'status': 'resolu'} # Pas besoin de changer 'agent_id' ici
@@ -276,24 +273,18 @@ class TicketAPITest(APITestCase):
         self.assertEqual(self.ticket_assigned_to_agent1.status, 'ignore')
 
     def test_agent_can_assign_unassigned_ticket_to_themselves(self):
-        """
-        Vérifie qu'un agent peut s'assigner un ticket non assigné.
-        """
         headers = self.get_auth_headers(self.agent1_access_token)
         url = reverse('ticket-update', args=[self.ticket_unassigned.id])
-        data = {'agent_id': self.agent1.id} # <--- CHANGEMENT ICI : 'agent_id' au lieu de 'agent'
+        data = {'agent_id': self.agent1.id} 
         response = self.client.patch(url, data, format='json', **headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.ticket_unassigned.refresh_from_db()
         self.assertEqual(self.ticket_unassigned.agent, self.agent1)
 
     def test_agent_cannot_assign_ticket_to_other_agent(self):
-        """
-        Vérifie qu'un agent ne peut pas assigner un ticket à un autre agent (sauf superuser).
-        """
         headers = self.get_auth_headers(self.agent1_access_token)
         url = reverse('ticket-update', args=[self.ticket_unassigned.id])
-        data = {'agent_id': self.agent2.id} # <--- CHANGEMENT ICI : 'agent_id' au lieu de 'agent'
+        data = {'agent_id': self.agent2.id} '
         response = self.client.patch(url, data, format='json', **headers)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN) 
         self.ticket_unassigned.refresh_from_db()

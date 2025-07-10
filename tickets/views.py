@@ -72,12 +72,9 @@ class IsSuperuserOrAssignedAgent(BasePermission):
             return True
         
         if obj.agent is None and request.method in ['PUT', 'PATCH']:
-            # L'agent peut s'assigner un ticket non assigné
-            # Vérifier si 'agent_id' est dans les données et correspond à l'utilisateur
             if 'agent_id' in request.data and request.data['agent_id'] == request.user.id:
                 return True
-            # Refuser si l'agent tente de modifier un ticket non assigné sans s'assigner
-            # ou de l'assigner à quelqu'un d'autre.
+            
             return False 
 
         return False
@@ -94,19 +91,15 @@ class TicketUpdateAPIView(RetrieveUpdateAPIView):
 
         data = request.data.copy()
 
-        # Logique d'assignation automatique de l'agent si le statut passe de 'nouveau' à 'en cours de traitement'
-        # et que le ticket n'est pas encore assigné.
-        # On injecte l'ID de l'agent dans les données sous le champ 'agent_id' (le champ d'input du serializer).
         if not request.user.is_superuser and \
            instance.status == 'nouveau' and \
            data.get('status') == 'en cours de traitement' and \
            not instance.agent:
-            data['agent_id'] = request.user.id # Utilisez 'agent_id' ici pour correspondre au serializer
+            data['agent_id'] = request.user.id 
 
-        # Le serializer va maintenant gérer la mise à jour de l'agent via 'agent_id'
         serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        serializer.save() # Le serializer.update() par défaut gérera l'assignation de l'agent via agent_id
+        serializer.save() 
 
         return Response(serializer.data)
 

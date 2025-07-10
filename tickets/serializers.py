@@ -3,39 +3,26 @@ from rest_framework import serializers
 from .models import Ticket
 from django.contrib.auth.models import User
 
-# Serializer pour les informations de base de l'agent (pour la sortie)
 class AgentSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'email']
 
-# Serializer pour le modèle Ticket
 class TicketSerializer(serializers.ModelSerializer):
-    # Ce champ 'agent' est pour la *sortie* (quand on lit un ticket).
-    # Il utilise AgentSerializer pour afficher les détails complets de l'agent.
+   
     agent = AgentSerializer(read_only=True)
-
-    # Ce nouveau champ 'agent_id' est pour l'*entrée* (quand on envoie un ID d'agent pour l'assigner).
-    # PrimaryKeyRelatedField sait comment prendre un ID et le lier à une instance de modèle.
-    # source='agent' indique que ce champ d'entrée correspond au champ 'agent' du modèle.
-    # write_only=True signifie qu'il est utilisé seulement pour l'écriture (input), pas pour la lecture (output).
-    # required=False et allow_null=True permettent de ne pas rendre l'assignation obligatoire.
     agent_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source='agent', write_only=True, required=False, allow_null=True
     )
 
     class Meta:
         model = Ticket
-        # Incluez 'agent' pour la sortie et 'agent_id' pour l'entrée.
-        # 'agent' est marqué comme read_only via extra_kwargs pour s'assurer qu'il n'est pas utilisé en entrée.
         fields = ['id', 'first_name', 'last_name', 'email', 'subject', 'message', 'platform_name', 'status', 'priority', 'submission_date', 'agent', 'agent_id']
         extra_kwargs = {
             'agent': {'read_only': True}
         }
 
     def create(self, validated_data):
-        # La logique de création est inchangée.
-        # Si 'agent_id' est passé à la création, ModelSerializer le gérera automatiquement.
         subject = validated_data.get('subject', '').lower()
         priority = 'basse'
 
@@ -63,7 +50,4 @@ class TicketSerializer(serializers.ModelSerializer):
         ticket = Ticket.objects.create(priority=priority, **validated_data)
         return ticket
 
-    # La méthode update par défaut de ModelSerializer gérera maintenant
-    # la mise à jour du champ 'agent' via 'agent_id' dans validated_data.
-    # Nous n'avons plus besoin de surcharger update ici.
-    # Supprimez votre méthode 'update' personnalisée de cette classe.
+ 
