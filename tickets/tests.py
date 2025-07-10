@@ -145,8 +145,6 @@ class TicketAdminLogicTest(TestCase):
 
 
 
-
-
 class TicketAPITest(APITestCase):
     def setUp(self):
         self.superuser = User.objects.create_superuser('admin_api', 'admin_api@example.com', 'adminpass')
@@ -239,3 +237,54 @@ class TicketAPITest(APITestCase):
         response = self.client.get(reverse('ticket-detail', args=[self.ticket_assigned_to_agent2.id]), **headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], self.ticket_assigned_to_agent2.id)
+
+
+
+    def test_assigned_agent_can_update_their_ticket(self):
+        headers = self.get_auth_headers(self.agent1_access_token)
+        url = reverse('ticket-update', args=[self.ticket_assigned_to_agent1.id])
+        data = {'status': 'resolu'} 
+        response = self.client.patch(url, data, format='json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.ticket_assigned_to_agent1.refresh_from_db()
+        self.assertEqual(self.ticket_assigned_to_agent1.status, 'resolu')
+
+
+    def test_other_agent_cannot_update_ticket(self):
+        headers = self.get_auth_headers(self.agent2_access_token) 
+        url = reverse('ticket-update', args=[self.ticket_assigned_to_agent1.id])
+        data = {'status': 'resolu'}
+        response = self.client.patch(url, data, format='json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND) 
+        self.ticket_assigned_to_agent1.refresh_from_db()
+        self.assertNotEqual(self.ticket_assigned_to_agent1.status, 'resolu')
+
+
+    def test_superuser_can_update_any_ticket(self):
+
+        headers = self.get_auth_headers(self.superuser_access_token)
+        url = reverse('ticket-update', args=[self.ticket_assigned_to_agent1.id])
+        data = {'status': 'ignore'} 
+        response = self.client.patch(url, data, format='json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.ticket_assigned_to_agent1.refresh_from_db()
+        self.assertEqual(self.ticket_assigned_to_agent1.status, 'ignore')
+
+    def test_agent_can_assign_unassigned_ticket_to_themselves(self):
+    
+        headers = self.get_auth_headers(self.agent1_access_token)
+        url = reverse('ticket-update', args=[self.ticket_unassigned.id])
+        data = {'agent': self.agent1.id} # Agent1 essaie de s'assigner le ticket
+        response = self.client.patch(url, data, format='json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.ticket_unassigned.refresh_from_db() # <--- AJOUTEZ CETTE LIGNE
+        self.assertEqual(self.ticket_unassigned.agent, self.agent1)
+
+    def test_agent_cannot_assign_ticket_to_other_agent(self):
+        headers = self.get_auth_headers(self.agent1_access_token)
+        url = reverse('ticket-update', args=[self.ticket_unassigned.id])
+        data = {'agent': self.agent2.id} 
+        response = self.client.patch(url, data, format='json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN) 
+        self.ticket_unassigned.refresh_from_db()
+        self.assertEqual(self.ticket_unassigned.agent, None) 
