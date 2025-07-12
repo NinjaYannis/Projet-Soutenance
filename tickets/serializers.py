@@ -1,10 +1,25 @@
 from rest_framework import serializers
 from .models import Ticket
+from django.contrib.auth.models import User
+
+class AgentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'email']
 
 class TicketSerializer(serializers.ModelSerializer):
+   
+    agent = AgentSerializer(read_only=True)
+    agent_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source='agent', write_only=True, required=False, allow_null=True
+    )
+
     class Meta:
         model = Ticket
-        fields = ['first_name', 'last_name', 'email', 'subject', 'message', 'platform_name']
+        fields = ['id', 'first_name', 'last_name', 'email', 'subject', 'message', 'platform_name', 'status', 'priority', 'submission_date', 'agent', 'agent_id']
+        extra_kwargs = {
+            'agent': {'read_only': True}
+        }
 
     def create(self, validated_data):
         subject = validated_data.get('subject', '').lower()
@@ -33,3 +48,5 @@ class TicketSerializer(serializers.ModelSerializer):
 
         ticket = Ticket.objects.create(priority=priority, **validated_data)
         return ticket
+
+ 
