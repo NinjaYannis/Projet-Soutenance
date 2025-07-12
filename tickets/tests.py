@@ -188,9 +188,7 @@ class TicketAPITest(APITestCase):
 
 
     def test_agent_sees_only_assigned_and_unassigned_tickets_in_list(self):
-        """
-        Vérifie qu'un agent ne voit que les tickets qui lui sont assignés ou qui sont non assignés.
-        """
+        
         headers = self.get_auth_headers(self.agent1_access_token)
         response = self.client.get(reverse('ticket-list'), **headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
