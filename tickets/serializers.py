@@ -1,10 +1,25 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from .models import Ticket
 
 class TicketSerializer(serializers.ModelSerializer):
+    agent = serializers.PrimaryKeyRelatedField(queryset=User.objects.none(), required=False)
+
     class Meta:
         model = Ticket
-        fields = ['first_name', 'last_name', 'email', 'subject', 'message', 'platform_name']
+        fields = [
+            'first_name', 'last_name', 'email', 'subject', 'message',
+            'platform_name', 'status', 'priority', 'agent'  #  Ajout des champs manquants
+        ]
+        read_only_fields = ['platform_name', 'priority']  #  On ne laisse pas modifier depuis le formulaire
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        if request and not request.user.is_superuser:
+            self.fields['agent'].queryset = User.objects.filter(id=request.user.id)
+        elif request:
+            self.fields['agent'].queryset = User.objects.all()
 
     def create(self, validated_data):
         subject = validated_data.get('subject', '').lower()
@@ -31,5 +46,5 @@ class TicketSerializer(serializers.ModelSerializer):
         elif any(keyword in subject for keyword in medium_keywords):
             priority = 'moyenne'
 
-        ticket = Ticket.objects.create(priority=priority, **validated_data)
-        return ticket
+        validated_data['priority'] = priority  #  On force la priorité ici
+        return super().create(validated_data)

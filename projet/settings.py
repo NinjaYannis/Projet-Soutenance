@@ -32,7 +32,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-votre_cle_secr
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
-.
+
 
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
@@ -44,8 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tickets', # Votre application pour les tickets 
-    'rest_framework', # Pour Django REST Framework 
+    'tickets', # mon_appli
+    'rest_framework', # Django REST Framework 
+    'drf_yasg',
     ]
 
 MIDDLEWARE = [
@@ -84,7 +85,7 @@ WSGI_APPLICATION = 'projet.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Changé pour PostgreSQL 
-        'NAME': os.environ.get('DB_NAME'), # Nom de votre base de données sur Supabase 
+        'NAME': os.environ.get('DB_NAME'), # base de données sur Supabase 
         'USER': os.environ.get('DB_USER'), # Utilisateur de la base de données 
         'PASSWORD': os.environ.get('DB_PASSWORD'), # Mot de passe de la base de données 
         'HOST': os.environ.get('DB_HOST'), # Hôte de la base de données Supabase 

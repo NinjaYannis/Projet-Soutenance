@@ -15,17 +15,17 @@ class Ticket(models.Model):
         ('moyenne', 'Moyenne'),
         ('critique', 'Critique'),
     ]
-
+    #---------------------
     first_name = models.CharField(max_length=100, verbose_name="Prénom du plaignant")
     last_name = models.CharField(max_length=100, verbose_name="Nom du plaignant")
     email = models.EmailField(max_length=255, verbose_name="Email du plaignant")
     
     subject = models.CharField(max_length=100, verbose_name="Sujet du ticket")
     message = models.TextField(verbose_name="Description détaillée")
-    
+    #---------------------
     submission_date = models.DateTimeField(default=timezone.now, verbose_name="Date de soumission")
     platform_name = models.CharField(max_length=100, verbose_name="Plateforme d'origine")
-    
+    #---------------------
     status = models.CharField(
         max_length=50,
         choices=STATUS_CHOICES,
