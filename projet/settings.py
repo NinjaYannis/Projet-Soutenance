@@ -11,15 +11,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import os # Importez le module os pour accéder aux variables d'environnement
-
-# Importez dotenv et chargez les variables d'environnement AU DÉBUT de settings.py
-# Assurez-vous d'avoir installé python-dotenv (pip install python-dotenv)
+import os
 from dotenv import load_dotenv
-load_dotenv() # Charge les variables du fichier .env
+load_dotenv() 
 
-from rest_framework.authentication import BaseAuthentication
-from rest_framework.exceptions import AuthenticationFailed
+from datetime import timedelta 
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,20 +27,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-votre_cle_secrete')
-# Il est recommandé de ne pas stocker la clé secrète en clair ici.
-# Elle devrait être une variable d'environnement ou chargée depuis un fichier séparé.
-# Pour le développement, l'exemple ci-dessus est suffisant.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-votre_cle_secrete_de_secours')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
-# Récupère DEBUG depuis une variable d'environnement, par défaut à True.
 
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
-# Récupère les hôtes autorisés depuis une variable d'environnement.
-# En développement, peut être vide ou 'localhost', '127.0.0.1'.
 
 
 # Application definition
@@ -55,8 +46,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tickets', # Votre application pour les tickets [cite: 1]
-    'rest_framework', # Pour Django REST Framework [cite: 1]
+    'tickets', 
+    'rest_framework',
+    'rest_framework_simplejwt.token_blacklist', 
+    'django_filters',
+    'drf_spectacular', 
 ]
 
 MIDDLEWARE = [
@@ -94,12 +88,12 @@ WSGI_APPLICATION = 'projet.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Changé pour PostgreSQL 
-        'NAME': os.environ.get('DB_NAME'), # Nom de votre base de données sur Supabase 
-        'USER': os.environ.get('DB_USER'), # Utilisateur de la base de données 
-        'PASSWORD': os.environ.get('DB_PASSWORD'), # Mot de passe de la base de données 
-        'HOST': os.environ.get('DB_HOST'), # Hôte de la base de données Supabase 
-        'PORT': os.environ.get('DB_PORT'), # Port de la base de données (généralement 5432) 
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
 
@@ -126,32 +120,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
+LANGUAGE_CODE = 'fr-fr'
 
-
-# Configuration pour les API Keys des plateformes d'origine
-# Ces clés sont chargées depuis le fichier .env
-API_KEYS = {
-    # Clé API : Nom de la plateforme associée
-    os.environ.get("API_KEY_SITE1"): "Site Web Principal Esseyi",
-    os.environ.get("API_KEY_SITE2"): "Africa Certif",
-    os.environ.get("API_KEY_SITE3"): "CV Studioo",
-}
-
-
-REST_FRAMEWORK = {
-
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-         'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ]
-}
-
-
-LANGUAGE_CODE = 'fr-fr' # Changé en français [cite: 1]
-
-TIME_ZONE = 'Africa/Porto-Novo' # Changé pour Cotonou, Bénin [cite: 1]
+TIME_ZONE = 'Africa/Porto-Novo'
 
 USE_I18N = True
 
@@ -167,3 +138,74 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+API_KEYS = {
+    os.environ.get("API_KEY_SITE1"): "Site Web Principal Esseyi",
+    os.environ.get("API_KEY_SITE2"): "Africa Certif",
+    os.environ.get("API_KEY_SITE3"): "CV Studioo",
+}
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication', 
+        'rest_framework.authentication.BasicAuthentication',   
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': os.environ.get('DJANGO_SECRET_KEY'),
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'JWK_URL': None,
+    'LEEWAY': 0,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API de Gestion des Tickets de Esseyi Services',
+    'DESCRIPTION': 'API pour la soumission et la gestion centralisée des retours utilisateurs.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True,
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': False,
+    },
+    'REDOC_UI_SETTINGS': {
+        'hideHostname': False,
+        'redocOptions': {
+            'pathInMiddlePanel': True,
+        },
+    },
+    'SCHEMA_PATH_PREFIX': r'/api/', 
+}
